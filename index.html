@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>DevMint — Desenvolvedor Web</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='22' fill='%230dff7a'/%3E%3Cpath d='M50 24 C32 31 26 51 33 68 C50 64 64 49 62 29 C58 26 54 25 50 24 Z' fill='none' stroke='%230a0a0a' stroke-width='6' stroke-linejoin='round'/%3E%3Crect x='41' y='68' width='10' height='5' rx='1.5' fill='%230a0a0a'/%3E%3C/svg%3E" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Inter',sans-serif;color:#f0f0f0;}
+a{color:inherit;}
+::selection{background:#0dff7a;color:#0a0a0a;}
+
+/* INTRO */
+#intro{position:fixed;inset:0;z-index:100;background:#050505;}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;}
+
+#wm{
+  position:absolute;bottom:130px;left:50%;transform:translateX(-50%);
+  text-align:center;z-index:10;pointer-events:none;
+  opacity:0;transition:opacity 1.2s ease;
+}
+#wm-name{
+  font-size:52px;font-weight:800;letter-spacing:-2px;color:#fff;line-height:1;
+  text-shadow:0 0 60px rgba(13,255,122,0.5);
+}
+#wm-name .d{font-weight:300;color:rgba(255,255,255,0.45);}
+#wm-name .g{color:#0dff7a;}
+#wm-tag{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:rgba(13,255,122,0.5);letter-spacing:0.28em;text-transform:uppercase;
+  margin-top:10px;
+}
+@keyframes blink{50%{opacity:0;}}
+#wm-cursor{animation:blink .9s step-end infinite;}
+
+#prog-wrap{
+  position:absolute;bottom:52px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:12px;z-index:10;
+}
+#prog-bg{width:180px;height:1.5px;background:rgba(13,255,122,0.18);border-radius:2px;}
+#prog-fill{height:1.5px;background:#0dff7a;border-radius:2px;width:0;box-shadow:0 0 8px #0dff7a;}
+#skip{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  color:rgba(13,255,122,0.4);letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;
+}
+#skip:hover{color:rgba(13,255,122,0.8);}
+
+#sw{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:160px;height:160px;border-radius:50%;
+  border:2px solid #0dff7a;
+  box-shadow:0 0 40px #0dff7a,inset 0 0 40px rgba(13,255,122,0.2);
+  opacity:0;pointer-events:none;z-index:11;
+}
+#sw2{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:220px;height:220px;border-radius:50%;
+  border:1px solid rgba(13,255,122,0.4);
+  opacity:0;pointer-events:none;z-index:11;
+}
+
+#flash{position:fixed;inset:0;z-index:95;background:#0dff7a;opacity:0;pointer-events:none;}
+
+/* SITE */
+#site{
+  position:fixed;inset:0;z-index:80;overflow-y:auto;
+  background:#0a0a0a;opacity:0;transform:scale(1.05);pointer-events:none;
+}
+#site.active{pointer-events:auto;}
+#wa{position:fixed;bottom:28px;right:28px;z-index:200;width:58px;height:58px;border-radius:50%;background:#22d96b;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(34,217,107,0.5),0 0 0 6px rgba(34,217,107,0.15);opacity:0;transition:opacity .5s;}
+
+.s-header{position:sticky;top:0;z-index:50;padding:20px 64px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,10,0.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.07);}
+.s-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.s-logo-name{font-weight:800;font-size:19px;letter-spacing:-0.02em;}
+.s-logo-name span{font-weight:300;color:rgba(240,240,240,0.55);}
+.s-nav{display:flex;gap:36px;font-size:14px;color:rgba(240,240,240,0.65);}
+.s-nav a{text-decoration:none;color:inherit;}
+.s-nav a:hover{color:#0dff7a;}
+.s-cta{background:#0dff7a;color:#0a0a0a;text-decoration:none;padding:11px 20px;font-size:14px;font-weight:700;border-radius:999px;}
+
+.s-hero{padding:100px 64px 120px;position:relative;overflow:hidden;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:64px 64px;}
+.s-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 72% 28%,rgba(13,255,122,0.14),transparent 55%),radial-gradient(circle at 15% 75%,rgba(13,255,122,0.06),transparent 50%);pointer-events:none;}
+.avail{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.1);background:rgba(13,255,122,0.06);font-size:13px;color:rgba(240,240,240,0.7);font-weight:500;margin-bottom:48px;}
+.avail .dot{width:7px;height:7px;border-radius:50%;background:#0dff7a;box-shadow:0 0 8px #0dff7a;}
+.s-h1{font-size:112px;font-weight:800;line-height:.95;letter-spacing:-.045em;color:#f0f0f0;margin:0;max-width:1200px;position:relative;z-index:1;}
+.s-h1 .g{color:#0dff7a;}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:80px;margin-top:72px;position:relative;z-index:1;}
+.s-p{font-size:20px;line-height:1.55;color:rgba(240,240,240,0.6);}
+.s-btns{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap;}
+.btn-p{background:#0dff7a;color:#0a0a0a;text-decoration:none;padding:17px 26px;border-radius:999px;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:10px;}
+.btn-s{background:transparent;color:#f0f0f0;text-decoration:none;padding:17px 22px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid rgba(255,255,255,0.15);}
+
+.s-section{padding:120px 64px;}
+.s-section.alt{background:#111;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#0dff7a;letter-spacing:.22em;text-transform:uppercase;margin-bottom:28px;}
+.s-h2{font-size:72px;font-weight:800;letter-spacing:-.04em;color:#f0f0f0;line-height:.97;margin:0 0 56px;}
+.cards5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:28px 20px;transition:border-color .2s,transform .2s;cursor:pointer;}
+.card:hover{border-color:rgba(13,255,122,0.45);transform:translateY(-5px);}
+.card-icon{width:40px;height:40px;color:#0dff7a;margin-bottom:18px;}
+.card-title{font-size:15px;font-weight:700;color:#f0f0f0;}
+.card-desc{font-size:13px;color:rgba(240,240,240,0.48);margin-top:8px;line-height:1.5;}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,0.08);margin-top:56px;}
+.step{padding:36px 28px;border-right:1px solid rgba(255,255,255,0.07);}
+.step:last-child{border-right:none;}
+.step-n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0dff7a;letter-spacing:.1em;margin-bottom:20px;}
+.step-t{font-size:28px;font-weight:600;color:#f0f0f0;letter-spacing:-.02em;}
+.step-d{font-size:14px;color:rgba(240,240,240,0.5);margin-top:14px;line-height:1.6;}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;}
+.ch{font-size:68px;font-weight:800;letter-spacing:-.04em;color:#f0f0f0;line-height:.97;margin:0 0 24px;}
+.ch .g{color:#0dff7a;}
+.c-links{display:flex;flex-direction:column;gap:12px;margin-top:36px;}
+.c-link{display:flex;align-items:center;gap:14px;text-decoration:none;padding:15px 18px;border:1px solid rgba(255,255,255,0.07);border-radius:14px;background:rgba(255,255,255,0.02);}
+.c-link:hover{border-color:rgba(13,255,122,0.3);}
+.c-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.c-lbl{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:.06em;}
+.c-val{font-size:15px;font-weight:500;color:#f0f0f0;margin-top:2px;}
+.s-form{background:#161616;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px;}
+.form-title{font-size:22px;font-weight:700;color:#f0f0f0;letter-spacing:-.02em;margin-bottom:6px;}
+.form-sub{font-size:13px;color:rgba(240,240,240,0.4);margin-bottom:24px;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.f-field{display:flex;flex-direction:column;gap:6px;}
+.f-lbl{font-size:11.5px;font-weight:600;color:rgba(240,240,240,0.5);}
+.f-inp{padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#f0f0f0;font-size:14px;font-family:inherit;outline:none;width:100%;}
+.f-inp::placeholder{color:rgba(240,240,240,0.28);}
+.f-inp:focus{border-color:#0dff7a;box-shadow:0 0 0 3px rgba(13,255,122,0.12);}
+.f-submit{margin-top:20px;width:100%;padding:16px;border-radius:12px;border:none;background:#0dff7a;color:#0a0a0a;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+.f-submit:hover{background:#0adc6d;}
+
+.s-footer{padding:32px 64px;background:#030303;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:rgba(255,255,255,0.38);border-top:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;gap:12px;}
+.ft-links{display:flex;gap:22px;}
+.ft-links a{color:rgba(255,255,255,0.4);text-decoration:none;}
+.ft-links a:hover{color:#0dff7a;}
+
+@media(max-width:860px){
+  .s-header{padding:16px 22px;}
+  .s-nav{display:none;}
+  .s-hero{padding:64px 22px 80px;}
+  .s-h1{font-size:54px;}
+  .hero-grid{grid-template-columns:1fr;gap:40px;margin-top:48px;}
+  .s-section{padding:72px 22px;}
+  .s-h2{font-size:40px;}
+  .cards5{grid-template-columns:1fr 1fr;}
+  .steps{grid-template-columns:1fr 1fr;}
+  .step{border-right:none;border-bottom:1px solid rgba(255,255,255,0.07);}
+  .contact-grid{grid-template-columns:1fr;gap:40px;}
+  .ch{font-size:40px;}
+  .s-footer{padding:24px 22px;}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <canvas id="c"></canvas>
+
+  <div id="wm">
+    <div id="wm-name">
+      <span class="d">Dev</span>Mint<span class="g" id="wm-cursor">_</span>
+    </div>
+    <div id="wm-tag">— Desenvolvedor Web —</div>
+  </div>
+
+  <div id="prog-wrap">
+    <div id="prog-bg"><div id="prog-fill"></div></div>
+    <div id="skip" onclick="window.doSkip()">[ clique para pular ]</div>
+  </div>
+
+  <div id="sw"></div>
+  <div id="sw2"></div>
+</div>
+
+<div id="flash"></div>
+
+<!-- SITE -->
+<div id="site">
+  <header class="s-header">
+    <a href="#" class="s-logo">
+      <svg width="32" height="32" viewBox="0 0 96 96" fill="none">
+        <path d="M50 22 C30 30 24 52 32 70 C50 66 66 50 64 28 C60 25 55 23 50 22 Z" stroke="#0dff7a" stroke-width="4.5" stroke-linejoin="round"/>
+        <path d="M56 30 C48 44 42 58 36 68" stroke="#0dff7a" stroke-width="3.5" stroke-linecap="round"/>
+        <rect x="40" y="70" width="10" height="5" rx="1.5" fill="#0dff7a"/>
+      </svg>
+      <span class="s-logo-name"><span>Dev</span>Mint</span>
+    </a>
+    <nav class="s-nav">
+      <a href="#services">O que faço</a>
+      <a href="#process">Como trabalho</a>
+      <a href="#contact">Contato</a>
+    </nav>
+    <a href="#contact" class="s-cta">Solicitar orçamento</a>
+  </header>
+
+  <section class="s-hero">
+    <div class="avail"><span class="dot"></span> Aceitando novos projetos · junho/26</div>
+    <h1 class="s-h1">Sistemas e soluções<br/><span class="g">sob medida</span><br/>para o seu negócio.</h1>
+    <div class="hero-grid">
+      <div>
+        <p class="s-p">Sou desenvolvedor de software por encomenda. Converso com você, entendo como o negócio funciona de verdade, e construo a ferramenta que cabe no seu dia — não o contrário.</p>
+        <div class="s-btns">
+          <a href="#contact" class="btn-p">Conversar comigo →</a>
+          <a href="#services" class="btn-s">Como trabalho</a>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:rgba(240,240,240,0.45);line-height:2.1;border:1px solid rgba(255,255,255,0.07);padding:28px 24px;border-radius:14px;background:#111111;">
+        <div style="color:rgba(255,255,255,0.2);font-size:10px;letter-spacing:.15em;margin-bottom:14px;">NA MESA AGORA</div>
+        <div><span style="color:#0dff7a;">01</span>&nbsp;&nbsp;Reunião de descoberta · 14h</div>
+        <div><span style="color:#0dff7a;">02</span>&nbsp;&nbsp;Sprint em andamento · cliente A</div>
+        <div><span style="color:#0dff7a;">03</span>&nbsp;&nbsp;Code review · módulo financeiro</div>
+        <div><span style="color:#0dff7a;">04</span>&nbsp;&nbsp;Suporte · fila vazia ✓</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s-section alt" id="services">
+    <div class="eyebrow">— O que faço</div>
+    <h2 class="s-h2">Software resolve<br/>problema.</h2>
+    <div class="cards5">
+      <div class="card"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h2M9 12h2M9 16h2M13 8h2M13 12h2M13 16h2"/></svg><div class="card-title">Web e mobile</div><div class="card-desc">Sistemas internos e apps de cliente sob encomenda.</div></div>
+      <div class="card"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg><div class="card-title">Landing pages</div><div class="card-desc">Páginas focadas em conversão e captação.</div></div>
+      <div class="card"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.5 12.5a2 2 0 002 1.5h8a2 2 0 002-1.5L21 8H6"/><circle cx="9" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg><div class="card-title">Loja virtual</div><div class="card-desc">E-commerce com pagamento integrado.</div></div>
+      <div class="card"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg><div class="card-title">Sistemas web</div><div class="card-desc">Painéis e ferramentas de operação interna.</div></div>
+      <div class="card"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 015.6 5.6l-8.5 8.5a2 2 0 01-2.8 0L4.6 16a2 2 0 010-2.8z"/><path d="M9 11l4 4"/></svg><div class="card-title">Manutenção</div><div class="card-desc">Suporte mensal e melhorias contínuas.</div></div>
+    </div>
+  </section>
+
+  <section class="s-section" id="process">
+    <div class="eyebrow">— Como trabalho</div>
+    <h2 class="s-h2">Quatro etapas.<br/><span style="color:#0dff7a;">Nenhuma surpresa.</span></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><div class="step-t">Conversa</div><div class="step-d">Você me conta o que precisa. Sem compromisso, sem pressão.</div></div>
+      <div class="step"><div class="step-n">02</div><div class="step-t">Proposta</div><div class="step-d">Escopo, prazo e valor fechados no papel. Sem surpresa.</div></div>
+      <div class="step"><div class="step-n">03</div><div class="step-t">Construção</div><div class="step-d">Entregas semanais. Você vê o sistema nascer e ajusta.</div></div>
+      <div class="step"><div class="step-n">04</div><div class="step-t">Entrega</div><div class="step-d">Treinamento incluído. Plantão na primeira semana.</div></div>
+    </div>
+  </section>
+
+  <section class="s-section alt" id="contact">
+    <div class="contact-grid">
+      <div>
+        <div class="eyebrow">— Vamos conversar</div>
+        <h2 class="ch">Conta pra mim o que está te <span class="g">atrapalhando.</span></h2>
+        <p style="font-size:16px;color:rgba(240,240,240,0.5);line-height:1.6;">Respondo em até 24h. Me fala a ideia pelo formulário ou direto pelos canais abaixo.</p>
+        <div class="c-links">
+          <a href="https://wa.me/5562993828137" class="c-link">
+            <div class="c-icon" style="background:rgba(13,255,122,0.1);color:#0dff7a;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-1 1.1-.2.2-.4.2-.6.1-.3-.1-1.2-.5-2.3-1.5-.9-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.7 1.2 2.9.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.3 4.8 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg></div>
+            <div><div class="c-lbl">WHATSAPP</div><div class="c-val">(62) 99382-8137</div></div>
+          </a>
+          <a href="#" class="c-link">
+            <div class="c-icon" style="background:rgba(13,255,122,0.06);color:rgba(13,255,122,0.7);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg></div>
+            <div><div class="c-lbl">E-MAIL</div><div class="c-val">em breve</div></div>
+          </a>
+          <a href="#" class="c-link">
+            <div class="c-icon" style="background:rgba(255,111,156,0.08);color:#ff6f9c;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
+            <div><div class="c-lbl">INSTAGRAM</div><div class="c-val">em breve</div></div>
+          </a>
+        </div>
+      </div>
+      <div class="s-form">
+        <div class="form-title">Solicite um orçamento</div>
+        <div class="form-sub">Sem compromisso · resposta em até 24h.</div>
+        <div class="f-row">
+          <div class="f-field"><label class="f-lbl">Nome</label><input class="f-inp" placeholder="Como posso te chamar?" /></div>
+          <div class="f-field"><label class="f-lbl">E-mail</label><input class="f-inp" placeholder="seu@email.com" type="email"/></div>
+        </div>
+        <div class="f-row">
+          <div class="f-field"><label class="f-lbl">WhatsApp</label><input class="f-inp" placeholder="(62) 99382-8137" /></div>
+          <div class="f-field"><label class="f-lbl">Serviço</label>
+            <select class="f-inp" aria-label="Serviço" style="appearance:none;cursor:pointer;">
+              <option value="" disabled selected>Selecione...</option>
+              <option>Site institucional</option><option>Landing page</option>
+              <option>Loja virtual</option><option>Sistema web</option><option>Manutenção</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-field"><label class="f-lbl">Mensagem</label><textarea class="f-inp" rows="4" placeholder="Conta sobre o seu projeto..." style="resize:vertical;min-height:88px;"></textarea></div>
+        <button type="button" class="f-submit">Enviar mensagem →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="s-footer">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="22" height="22" viewBox="0 0 96 96" fill="none"><path d="M50 22 C30 30 24 52 32 70 C50 66 66 50 64 28 C60 25 55 23 50 22 Z" stroke="#0dff7a" stroke-width="5" stroke-linejoin="round"/><rect x="40" y="70" width="10" height="5" rx="1.5" fill="#0dff7a"/></svg>
+      <span>© 2026 DevMint · Matheus Renan · Goiânia, Brasil</span>
+    </div>
+    <div class="ft-links">
+      <a href="https://wa.me/5562993828137">WhatsApp</a>
+      <a href="#">Instagram</a>
+    </div>
+  </footer>
+</div>
+
+<a class="wa-float" id="wa" href="https://wa.me/5562993828137" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-1 1.1-.2.2-.4.2-.6.1-.3-.1-1.2-.5-2.3-1.5-.9-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.7 1.2 2.9.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.3 4.8 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+</a>
+
+<!-- 3D ENGINE -->
+<script type="module">
+import * as THREE from 'https://esm.sh/three@0.158.0';
+import { OrbitControls } from 'https://esm.sh/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+
+const DURATION = 6500;
+let phase = 'orbit', skipCalled = false;
+let shockDone = false, orbitAngle = 0.35;
+const startTime = performance.now();
+
+const canvas = document.getElementById('c');
+const W = () => innerWidth, H = () => innerHeight;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(W(), H());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.setClearColor(0x030303);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x030303, 0.032);
+const camera = new THREE.PerspectiveCamera(42, W()/H(), 0.1, 120);
+camera.position.set(4, 2.5, 11);
+camera.lookAt(0, 0, 0);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.06));
+const mainL = new THREE.PointLight(0x0dff7a, 16, 24); mainL.position.set(0, 0, 7); scene.add(mainL);
+const side1 = new THREE.PointLight(0x0dff7a, 8, 18); side1.position.set(5, 4, -2); scene.add(side1);
+const side2 = new THREE.PointLight(0x0dff7a, 5, 14); side2.position.set(-5, -2, -4); scene.add(side2);
+const bot   = new THREE.PointLight(0x0dff7a, 4, 12); bot.position.set(0, -5, 2); scene.add(bot);
+const fill  = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-3, 5, 3); scene.add(fill);
+const rim   = new THREE.DirectionalLight(0x0dff7a, 1.6); rim.position.set(0, -3, -5); scene.add(rim);
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0x111111, metalness: 0, roughness: 0, transmission: 1, thickness: 0.5,
+  transparent: true, opacity: 0.06, side: THREE.DoubleSide, depthWrite: false, ior: 1.45,
+});
+const neonMat = new THREE.MeshStandardMaterial({
+  color: 0x0dff7a, emissive: 0x0dff7a, emissiveIntensity: 2.4,
+  metalness: 0, roughness: 0.05,
+});
+
+const SC = 3/88;
+const sv = (x, y, z=0) => new THREE.Vector3((x-48)*SC, -(y-48)*SC, z);
+function cubic(p0,p1,p2,p3,n,z) {
+  const out=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,u=1-t;
+    out.push(sv(u**3*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t**3*p3[0],
+                u**3*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t**3*p3[1],z));
+  }
+  return out;
+}
+function roundedSquare(s,r,z,seg=14){
+  const pts=[];
+  for(let i=0;i<=seg;i++) pts.push(new THREE.Vector3(-s+r+(2*(s-r)/seg)*i,-s,z));
+  for(let i=1;i<=seg;i++){const a=-Math.PI/2+(Math.PI/2)*(i/seg);pts.push(new THREE.Vector3(s-r+Math.cos(a)*r,-s+r+Math.sin(a)*r,z));}
+  for(let i=1;i<=seg;i++) pts.push(new THREE.Vector3(s,-s+r+(2*(s-r)/seg)*i,z));
+  for(let i=1;i<=seg;i++){const a=(Math.PI/2)*(i/seg);pts.push(new THREE.Vector3(s-r+Math.cos(a)*r,s-r+Math.sin(a)*r,z));}
+  for(let i=1;i<=seg;i++) pts.push(new THREE.Vector3(s-r-(2*(s-r)/seg)*i,s,z));
+  for(let i=1;i<=seg;i++){const a=Math.PI/2+(Math.PI/2)*(i/seg);pts.push(new THREE.Vector3(-s+r+Math.cos(a)*r,s-r+Math.sin(a)*r,z));}
+  for(let i=1;i<=seg;i++) pts.push(new THREE.Vector3(-s,s-r-(2*(s-r)/seg)*i,z));
+  for(let i=1;i<=seg;i++){const a=Math.PI+(Math.PI/2)*(i/seg);pts.push(new THREE.Vector3(-s+r+Math.cos(a)*r,-s+r+Math.sin(a)*r,z));}
+  pts.push(pts[0].clone()); return pts;
+}
+
+const logo = new THREE.Group();
+scene.add(logo);
+
+[[2.6,.07],[4.0,.035],[6.5,.015]].forEach(([r,op])=>{
+  const m=new THREE.MeshBasicMaterial({color:0x0dff7a,transparent:true,opacity:op,side:THREE.BackSide,depthWrite:false,blending:THREE.AdditiveBlending});
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(r,32,32),m));
+});
+
+const bs=1.5,br=0.35;
+const bsh=new THREE.Shape();
+bsh.moveTo(-bs+br,-bs);bsh.lineTo(bs-br,-bs);bsh.quadraticCurveTo(bs,-bs,bs,-bs+br);bsh.lineTo(bs,bs-br);bsh.quadraticCurveTo(bs,bs,bs-br,bs);bsh.lineTo(-bs+br,bs);bsh.quadraticCurveTo(-bs,bs,-bs,bs-br);bsh.lineTo(-bs,-bs+br);bsh.quadraticCurveTo(-bs,-bs,-bs+br,-bs);
+const bGeo=new THREE.ExtrudeGeometry(bsh,{depth:.35,bevelEnabled:true,bevelThickness:.06,bevelSize:.06,bevelSegments:6});
+bGeo.center();
+const bMesh=new THREE.Mesh(bGeo,glassMat); bMesh.position.z=-.18; logo.add(bMesh);
+
+const sqPts=roundedSquare(1.5,.35,.22);
+const sqC=new THREE.CatmullRomCurve3(sqPts,true,'catmullrom',.3);
+logo.add(new THREE.Mesh(new THREE.TubeGeometry(sqC,300,.045,10,true),neonMat));
+
+const Z=0.24;
+const lPts=[...cubic([50,22],[30,30],[24,52],[32,70],30,Z),...cubic([32,70],[50,66],[66,50],[64,28],30,Z),...cubic([64,28],[60,25],[55,23],[50,22],14,Z)];
+const lC=new THREE.CatmullRomCurve3(lPts,true,'catmullrom',.3);
+logo.add(new THREE.Mesh(new THREE.TubeGeometry(lC,320,.10,12,true),neonMat));
+const vPts=cubic([56,30],[48,44],[42,58],[36,68],40,Z);
+const vC=new THREE.CatmullRomCurve3(vPts,false,'catmullrom',.5);
+logo.add(new THREE.Mesh(new THREE.TubeGeometry(vC,60,.07,10,false),neonMat));
+const cur=new THREE.Mesh(new THREE.BoxGeometry(.34,.16,.16),neonMat);
+cur.position.copy(sv(45,73,Z)); logo.add(cur);
+
+const leafC2=document.createElement('canvas'); leafC2.width=64; leafC2.height=64;
+const lc2=leafC2.getContext('2d');
+lc2.clearRect(0,0,64,64); lc2.strokeStyle='#0dff7a'; lc2.lineWidth=3; lc2.shadowColor='#0dff7a'; lc2.shadowBlur=10;
+lc2.beginPath(); lc2.moveTo(32,8); lc2.bezierCurveTo(14,18,10,40,20,56); lc2.bezierCurveTo(32,52,48,40,46,18); lc2.bezierCurveTo(42,12,36,9,32,8); lc2.stroke();
+lc2.beginPath(); lc2.moveTo(36,14); lc2.bezierCurveTo(30,30,26,44,22,54); lc2.lineWidth=1.5; lc2.stroke();
+const leafTex=new THREE.CanvasTexture(leafC2);
+
+const PC=320;
+const pPos=new Float32Array(PC*3), pPh=new Float32Array(PC), pSp=new Float32Array(PC);
+for(let i=0;i<PC;i++){
+  const th=Math.random()*Math.PI*2,ph=Math.random()*Math.PI,r=3.5+Math.random()*9;
+  pPos[i*3]=r*Math.sin(ph)*Math.cos(th); pPos[i*3+1]=r*Math.cos(ph); pPos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+  pPh[i]=Math.random()*Math.PI*2; pSp[i]=.002+Math.random()*.005;
+}
+const pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+const pMat=new THREE.PointsMaterial({color:0x0dff7a,size:.6,transparent:true,opacity:.85,map:leafTex,alphaMap:leafTex,alphaTest:.01,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+scene.add(new THREE.Points(pGeo,pMat));
+
+const FLOOR_Y=-3.5;
+const grid=new THREE.GridHelper(40,40,0x0dff7a,0x0dff7a);
+grid.material.transparent=true; grid.material.opacity=.20; grid.position.y=FLOOR_Y;
+scene.add(grid);
+const mirrorMesh=new THREE.Mesh(new THREE.PlaneGeometry(50,50),new THREE.MeshStandardMaterial({color:0x010101,metalness:1,roughness:.04,transparent:true,opacity:.95}));
+mirrorMesh.rotation.x=-Math.PI/2; mirrorMesh.position.y=FLOOR_Y-.01; scene.add(mirrorMesh);
+
+const refl=logo.clone();
+refl.scale.y=-1; refl.position.y=FLOOR_Y*2;
+refl.traverse(c=>{if(c.isMesh&&c.material){c.material=c.material.clone();c.material.transparent=true;c.material.opacity=(c.material.opacity||1)*.32;c.material.depthWrite=false;}});
+scene.add(refl);
+
+window.doSkip=function(){if(!skipCalled){skipCalled=true;phase='fall';}};
+document.addEventListener('keydown',window.doSkip);
+document.getElementById('intro').addEventListener('click',window.doSkip);
+setTimeout(()=>{document.getElementById('wm').style.opacity='1';},1800);
+
+function doSite(){
+  const sw=document.getElementById('sw'), sw2=document.getElementById('sw2');
+  sw.style.opacity='1'; sw.style.transition='transform .7s cubic-bezier(.2,.8,.3,1),opacity .7s ease-out';
+  sw.style.transform='translate(-50%,-50%) scale(10)'; sw.style.opacity='0';
+  setTimeout(()=>{sw2.style.opacity='.7';sw2.style.transition='transform .9s cubic-bezier(.2,.8,.3,1),opacity .9s ease-out';sw2.style.transform='translate(-50%,-50%) scale(14)';sw2.style.opacity='0';},100);
+
+  const flash=document.getElementById('flash');
+  flash.style.transition='opacity .18s ease-out'; flash.style.opacity='.95';
+  setTimeout(()=>{
+    const site=document.getElementById('site');
+    site.style.transition='opacity .65s ease-out,transform .65s cubic-bezier(.16,1,.3,1)';
+    site.style.opacity='1'; site.style.transform='scale(1)';
+    site.classList.add('active');
+    document.getElementById('wa').style.opacity='1';
+    flash.style.transition='opacity .5s ease-out'; flash.style.opacity='0';
+    document.getElementById('intro').style.opacity='0';
+    document.getElementById('intro').style.transition='opacity .5s';
+    setTimeout(()=>{
+      document.getElementById('intro').style.display='none';
+      flash.style.display='none';
+      document.body.style.overflow='';
+      renderer.dispose();
+    },800);
+  },280);
+}
+
+window.addEventListener('resize',()=>{camera.aspect=W()/H();camera.updateProjectionMatrix();renderer.setSize(W(),H());});
+
+const clock=new THREE.Clock();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+  const elapsed=performance.now()-startTime;
+
+  if(phase==='orbit'){
+    const p=Math.min(elapsed/DURATION,1);
+    document.getElementById('prog-fill').style.width=(p*100)+'%';
+    if(p>=1){phase='fall';skipCalled=true;}
+
+    orbitAngle+=.003;
+    camera.position.x=Math.sin(orbitAngle)*10;
+    camera.position.z=Math.cos(orbitAngle)*10;
+    camera.position.y=2.2+Math.sin(t*.25)*.8;
+    camera.lookAt(0,.2,0);
+
+    neonMat.emissiveIntensity=2.2+Math.sin(t*1.8)*.9;
+    mainL.intensity=14+Math.sin(t*1.4)*5;
+
+    logo.position.y=Math.sin(t*.65)*.14;
+
+  } else if(phase==='fall'){
+    camera.position.z = Math.max(1.5, camera.position.z - 0.16);
+    camera.position.y += (0 - camera.position.y) * 0.04;
+    camera.lookAt(0,0,0);
+    logo.rotation.y += .12;
+    neonMat.emissiveIntensity = 3.0 + Math.sin(t*3)*1.5;
+    mainL.intensity = 20 + Math.sin(t*3)*8;
+    if(!shockDone && camera.position.z <= 2.0){
+      shockDone = true;
+      mainL.intensity = 120;
+      setTimeout(()=>doSite(), 150);
+      phase = 'exit';
+    }
+
+  } else if(phase==='exit'){
+    mainL.intensity=Math.max(0,mainL.intensity-3);
+    neonMat.emissiveIntensity=Math.max(0,neonMat.emissiveIntensity-.1);
+  }
+
+  refl.position.y=FLOOR_Y*2-logo.position.y;
+  refl.rotation.copy(logo.rotation);
+
+  const pos=pGeo.attributes.position.array;
+  for(let i=0;i<PC;i++){
+    pos[i*3+1]+=pSp[i];
+    if(pos[i*3+1]>12) pos[i*3+1]=-4;
+    pos[i*3]+=Math.sin(t*.4+pPh[i])*.008;
+    pos[i*3+2]+=Math.cos(t*.3+pPh[i])*.006;
+  }
+  pGeo.attributes.position.needsUpdate=true;
+
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>

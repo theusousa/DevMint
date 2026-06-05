@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>DevMint — Desenvolvedor Web</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="DevMint — desenvolvimento web sob medida: sites, landing pages e aplicações React com performance e design." />
+<meta property="og:title" content="DevMint — Desenvolvedor Web" />
+<meta property="og:description" content="Sites, landing pages e aplicações React com performance e design." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0a0a0a; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #e6e6e6; }
+  * { box-sizing: border-box; }
+  ::selection { background: #0dff7a; color: #0a0a0a; }
+  html { scroll-behavior: smooth; }
+  a { color: inherit; text-decoration: none; }
+  input:focus, select:focus, textarea:focus {
+    border-color: #0dff7a !important;
+    box-shadow: 0 0 0 4px rgba(13,255,122,0.15) !important;
+  }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; }
+  .reveal.in { animation: fadeUp .7s ease forwards; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal, .reveal.in { animation: none !important; opacity: 1 !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="renan-desktop.jsx" data-presets="env,react"></script>
+<script type="text/babel" data-presets="env,react">
+ReactDOM.createRoot(document.getElementById('root')).render(<window.RenanDesktop />);
+</script>
+</body>
+</html>
